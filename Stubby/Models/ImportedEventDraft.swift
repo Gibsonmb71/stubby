@@ -3,6 +3,7 @@ import Foundation
 struct ParsedEventDetails: Equatable {
     var title: String?
     var date: Date?
+    var dateMissingYear: PartialEventDate?
     var venue: String?
     var section: String?
     var row: String?
@@ -16,6 +17,7 @@ struct ImportedEventDraft: Identifiable, Equatable {
     var id = UUID()
     var title: String
     var date: Date?
+    var dateMissingYear: PartialEventDate?
     var venue: String
     var section: String
     var row: String
@@ -33,6 +35,7 @@ struct ImportedEventDraft: Identifiable, Equatable {
     init(
         title: String = "",
         date: Date? = nil,
+        dateMissingYear: PartialEventDate? = nil,
         venue: String = "",
         section: String = "",
         row: String = "",
@@ -49,6 +52,7 @@ struct ImportedEventDraft: Identifiable, Equatable {
     ) {
         self.title = title
         self.date = date
+        self.dateMissingYear = dateMissingYear
         self.venue = venue
         self.section = section
         self.row = row
@@ -68,6 +72,7 @@ struct ImportedEventDraft: Identifiable, Equatable {
         self.init(
             title: details.title ?? "",
             date: details.date,
+            dateMissingYear: details.dateMissingYear,
             venue: details.venue ?? "",
             section: details.section ?? "",
             row: details.row ?? "",
@@ -110,11 +115,19 @@ struct ImportedEventDraft: Identifiable, Equatable {
     mutating func apply(_ match: SportsGameMatch, logoURL: URL? = nil) {
         title = match.title
         date = match.gameDate
+        dateMissingYear = nil
         venue = match.venue ?? venue
         category = "\(match.sport.capitalized) · \(match.league)"
         participants = [match.awayTeam.name, match.homeTeam.name]
         imageURL = logoURL ?? match.homeTeam.logoURL ?? match.awayTeam.logoURL
         sportsGame = match
+    }
+
+    mutating func resolveMissingYear(_ year: Int) {
+        guard let dateMissingYear, let resolvedDate = dateMissingYear.date(in: year) else { return }
+        date = resolvedDate
+        self.dateMissingYear = nil
+        ticketDetails?.originalDate = resolvedDate
     }
 }
 
@@ -122,4 +135,33 @@ struct TicketImportResult: Identifiable {
     var id = UUID()
     var draft: ImportedEventDraft
     var previewImageData: Data?
+}
+
+struct PartialEventDate: Equatable {
+    var month: Int
+    var day: Int
+    var hour: Int?
+    var minute: Int?
+
+    func date(in year: Int) -> Date? {
+        var components = DateComponents()
+        components.calendar = Calendar.current
+        components.timeZone = .current
+        components.year = year
+        components.month = month
+        components.day = day
+        components.hour = hour ?? 0
+        components.minute = minute ?? 0
+        return components.date
+    }
+
+    var displayText: String {
+        guard let date = date(in: 2000) else { return "detected date" }
+
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = .current
+        formatter.dateFormat = hour == nil ? "MMM d" : "MMM d, h:mm a"
+        return formatter.string(from: date)
+    }
 }

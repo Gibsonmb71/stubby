@@ -47,6 +47,7 @@ struct TicketDetails: Codable, Equatable {
 
 enum SportsLookupStatus: Equatable {
     case idle
+    case needsDateYear
     case searching
     case matched(SportsGameMatch)
     case candidates([SportsGameMatch])
@@ -57,6 +58,8 @@ enum SportsLookupStatus: Equatable {
         switch self {
         case .idle:
             return "ESPN Lookup Ready"
+        case .needsDateYear:
+            return "Choose Ticket Year"
         case .searching:
             return "Searching ESPN"
         case .matched:

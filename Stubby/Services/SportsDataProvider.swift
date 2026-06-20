@@ -1,8 +1,11 @@
 import Foundation
+import os
 
 protocol SportsDataProvider {
     func events(sportPath: String, date: Date) async throws -> [SportsGameMatch]
 }
+
+private let sportsLookupLogger = Logger(subsystem: "com.gibsonbell.stubby", category: "ESPNLookup")
 
 struct ESPNSportsDataProvider: SportsDataProvider {
     func events(sportPath: String, date: Date) async throws -> [SportsGameMatch] {
@@ -17,27 +20,60 @@ struct ESPNSportsDataProvider: SportsDataProvider {
         components?.queryItems = queryItems
 
         guard let url = components?.url else {
+            sportsLookupLogger.error("Failed to build ESPN URL for path=\(sportPath, privacy: .public)")
             throw URLError(.badURL)
         }
 
+        sportsLookupLogger.info("Requesting ESPN scoreboard path=\(sportPath, privacy: .public) date=\(Self.dateString(for: date), privacy: .public)")
         let (data, response) = try await URLSession.shared.data(from: url)
-        guard let httpResponse = response as? HTTPURLResponse, 200..<300 ~= httpResponse.statusCode else {
-            throw URLError(.badServerResponse)
+        guard let httpResponse = response as? HTTPURLResponse else {
+            sportsLookupLogger.error("ESPN response was not HTTP for path=\(sportPath, privacy: .public)")
+            throw ESPNLookupError.invalidResponse(url)
+        }
+        guard 200..<300 ~= httpResponse.statusCode else {
+            let body = String(data: data.prefix(500), encoding: .utf8) ?? ""
+            sportsLookupLogger.error("ESPN HTTP \(httpResponse.statusCode, privacy: .public) path=\(sportPath, privacy: .public) body=\(body, privacy: .public)")
+            throw ESPNLookupError.httpStatus(httpResponse.statusCode, url)
         }
 
-        let scoreboard = try JSONDecoder().decode(ESPNScoreboard.self, from: data)
+        let scoreboard: ESPNScoreboard
+        do {
+            scoreboard = try JSONDecoder().decode(ESPNScoreboard.self, from: data)
+        } catch {
+            sportsLookupLogger.error("Failed to decode ESPN scoreboard path=\(sportPath, privacy: .public) error=\(error.localizedDescription, privacy: .public)")
+            throw error
+        }
         let pathParts = sportPath.split(separator: "/").map(String.init)
         let sport = pathParts.first ?? ""
         let league = pathParts.dropFirst().joined(separator: "/")
+        var skippedEvents = 0
 
-        return scoreboard.events.compactMap { event in
-            guard let competition = event.competitions.first else { return nil }
+        let games = scoreboard.events.compactMap { event -> SportsGameMatch? in
+            guard let competition = event.competitions.first else {
+                skippedEvents += 1
+                sportsLookupLogger.debug("Skipping ESPN event \(event.id, privacy: .public): missing competition")
+                return nil
+            }
             let competitors = competition.competitors
+            guard competitors.count >= 2 else {
+                skippedEvents += 1
+                sportsLookupLogger.debug("Skipping ESPN event \(event.id, privacy: .public): not enough competitors")
+                return nil
+            }
+            let fallbackHome = competitors.last
+            let fallbackAway = competitors.first
             guard
-                let home = competitors.first(where: { $0.homeAway == "home" }),
-                let away = competitors.first(where: { $0.homeAway == "away" }),
+                let home = competitors.first(where: { $0.homeAway == "home" }) ?? fallbackHome,
+                let away = competitors.first(where: { $0.homeAway == "away" }) ?? fallbackAway,
                 let gameDate = ESPNDateParser.date(from: competition.date ?? event.date)
             else {
+                skippedEvents += 1
+                sportsLookupLogger.debug("Skipping ESPN event \(event.id, privacy: .public): missing teams or date")
+                return nil
+            }
+            guard home.id != away.id else {
+                skippedEvents += 1
+                sportsLookupLogger.debug("Skipping ESPN event \(event.id, privacy: .public): duplicate competitors")
                 return nil
             }
 
@@ -58,9 +94,12 @@ struct ESPNSportsDataProvider: SportsDataProvider {
                     ?? event.links?.first?.href
             )
         }
+
+        sportsLookupLogger.info("Decoded \(games.count, privacy: .public) ESPN games path=\(sportPath, privacy: .public), skipped=\(skippedEvents, privacy: .public)")
+        return games
     }
 
-    private static func dateString(for date: Date) -> String {
+    static func dateString(for date: Date) -> String {
         let formatter = DateFormatter()
         formatter.calendar = Calendar(identifier: .gregorian)
         formatter.locale = Locale(identifier: "en_US_POSIX")
@@ -69,6 +108,20 @@ struct ESPNSportsDataProvider: SportsDataProvider {
         return formatter.string(from: date)
     }
 
+}
+
+enum ESPNLookupError: LocalizedError {
+    case invalidResponse(URL)
+    case httpStatus(Int, URL)
+
+    var errorDescription: String? {
+        switch self {
+        case .invalidResponse(let url):
+            return "ESPN returned a non-HTTP response for \(url.absoluteString)."
+        case .httpStatus(let statusCode, let url):
+            return "ESPN returned HTTP \(statusCode) for \(url.absoluteString)."
+        }
+    }
 }
 
 enum ESPNDateParser {
@@ -91,7 +144,7 @@ enum ESPNDateParser {
         formatter.locale = Locale(identifier: "en_US_POSIX")
         formatter.timeZone = TimeZone(secondsFromGMT: 0)
 
-        for format in ["yyyy-MM-dd'T'HH:mmX", "yyyy-MM-dd'T'HH:mm:ssX"] {
+        for format in ["yyyy-MM-dd'T'HH:mmX", "yyyy-MM-dd'T'HH:mm:ssX", "yyyy-MM-dd'T'HH:mm:ss.SSSX", "yyyy-MM-dd HH:mm:ss"] {
             formatter.dateFormat = format
             if let date = formatter.date(from: value) {
                 return date
@@ -109,22 +162,32 @@ struct SportsGameMatcher {
         guard let date = draft.date else { return [] }
 
         let sportPaths = sportPaths(for: draft)
-        var candidates: [SportsGameMatch] = []
+        let dates = lookupDates(for: date)
+        var candidatesByID: [String: SportsGameMatch] = [:]
         var lookupErrors: [Error] = []
+        sportsLookupLogger.info("Starting ESPN match title=\(draft.title, privacy: .public) venue=\(draft.venue, privacy: .public) paths=\(sportPaths.joined(separator: ","), privacy: .public)")
         for path in sportPaths {
-            do {
-                let games = try await provider.events(sportPath: path, date: date)
-                candidates.append(contentsOf: games.map { game in
-                    var scored = game
-                    scored.confidence = score(game, against: draft)
-                    return scored
-                })
-            } catch {
-                lookupErrors.append(error)
+            for lookupDate in dates {
+                do {
+                    let games = try await provider.events(sportPath: path, date: lookupDate)
+                    sportsLookupLogger.debug("Scoring \(games.count, privacy: .public) ESPN games path=\(path, privacy: .public) lookupDate=\(ESPNSportsDataProvider.dateString(for: lookupDate), privacy: .public)")
+                    for game in games {
+                        var scored = game
+                        scored.confidence = score(game, against: draft)
+                        if let existing = candidatesByID[scored.espnEventID] {
+                            candidatesByID[scored.espnEventID] = betterCandidate(existing, scored, targetDate: date)
+                        } else {
+                            candidatesByID[scored.espnEventID] = scored
+                        }
+                    }
+                } catch {
+                    lookupErrors.append(error)
+                    sportsLookupLogger.error("ESPN lookup failed path=\(path, privacy: .public) lookupDate=\(ESPNSportsDataProvider.dateString(for: lookupDate), privacy: .public) error=\(error.localizedDescription, privacy: .public)")
+                }
             }
         }
 
-        let scoredCandidates = candidates
+        let scoredCandidates = Array(candidatesByID.values)
             .filter { $0.confidence >= 35 }
             .sorted { lhs, rhs in
                 if lhs.confidence == rhs.confidence {
@@ -132,11 +195,34 @@ struct SportsGameMatcher {
                 }
                 return lhs.confidence > rhs.confidence
             }
-        if scoredCandidates.isEmpty, let firstError = lookupErrors.first, lookupErrors.count == sportPaths.count {
+        if let best = scoredCandidates.first {
+            sportsLookupLogger.info("Best ESPN match id=\(best.espnEventID, privacy: .public) title=\(best.title, privacy: .public) confidence=\(best.confidence, privacy: .public)")
+        } else {
+            let bestRejected = candidatesByID.values.max { lhs, rhs in lhs.confidence < rhs.confidence }
+            sportsLookupLogger.warning("No ESPN candidates above threshold. total=\(candidatesByID.count, privacy: .public) bestRejected=\(bestRejected?.title ?? "none", privacy: .public) confidence=\(bestRejected?.confidence ?? 0, privacy: .public)")
+        }
+        if scoredCandidates.isEmpty, let firstError = lookupErrors.first, lookupErrors.count == sportPaths.count * dates.count {
             throw firstError
         }
 
         return scoredCandidates
+    }
+
+    private func lookupDates(for date: Date) -> [Date] {
+        let calendar = Calendar.current
+        return [
+            date,
+            calendar.date(byAdding: .day, value: -1, to: date),
+            calendar.date(byAdding: .day, value: 1, to: date)
+        ].compactMap { $0 }
+    }
+
+    private func betterCandidate(_ lhs: SportsGameMatch, _ rhs: SportsGameMatch, targetDate: Date) -> SportsGameMatch {
+        if lhs.confidence != rhs.confidence {
+            return lhs.confidence > rhs.confidence ? lhs : rhs
+        }
+
+        return abs(lhs.gameDate.timeIntervalSince(targetDate)) <= abs(rhs.gameDate.timeIntervalSince(targetDate)) ? lhs : rhs
     }
 
     private func sportPaths(for draft: ImportedEventDraft) -> [String] {
@@ -153,7 +239,7 @@ struct SportsGameMatcher {
                 : ["football/nfl", "football/college-football"]
         }
         if text.contains("basketball") {
-            return text.contains("women") ? ["basketball/womens-college-basketball", "basketball/wnba"] : ["basketball/mens-college-basketball", "basketball/nba"]
+            return text.contains("women") || text.contains("womens") ? ["basketball/womens-college-basketball", "basketball/wnba", "basketball/mens-college-basketball", "basketball/nba"] : ["basketball/mens-college-basketball", "basketball/nba", "basketball/womens-college-basketball", "basketball/wnba"]
         }
         if text.contains("hockey") {
             return ["hockey/nhl", "hockey/mens-college-hockey", "hockey/womens-college-hockey"]
@@ -166,18 +252,29 @@ struct SportsGameMatcher {
             "baseball/college-baseball",
             "football/college-football",
             "basketball/mens-college-basketball",
+            "basketball/womens-college-basketball",
             "baseball/mlb",
             "football/nfl",
             "basketball/nba",
+            "basketball/wnba",
             "hockey/nhl",
-            "soccer/usa.1"
+            "hockey/mens-college-hockey",
+            "soccer/usa.1",
+            "soccer/eng.1"
         ]
     }
 
     private func score(_ game: SportsGameMatch, against draft: ImportedEventDraft) -> Int {
         var score = 0
+        let searchText = [
+            draft.title,
+            draft.sourceText,
+            draft.participants.joined(separator: " "),
+            draft.ticketDetails?.originalTitle ?? "",
+            draft.ticketDetails?.originalVenue ?? ""
+        ].joined(separator: " ")
         let title = normalized(draft.title)
-        let source = normalized(draft.sourceText)
+        let source = normalized(searchText)
         let venue = normalized(draft.venue)
         let haystack = [title, source].joined(separator: " ")
 
@@ -185,12 +282,19 @@ struct SportsGameMatcher {
             score += 30
         }
 
-        let homeTokens = significantTokens(game.homeTeam.name)
-        let awayTokens = significantTokens(game.awayTeam.name)
+        let homeTokens = teamTokens(game.homeTeam)
+        let awayTokens = teamTokens(game.awayTeam)
         let homeHits = tokenHits(homeTokens, in: haystack)
         let awayHits = tokenHits(awayTokens, in: haystack)
         if homeHits > 0 { score += 25 + min(homeHits * 4, 12) }
         if awayHits > 0 { score += 25 + min(awayHits * 4, 12) }
+
+        if let abbreviation = game.homeTeam.abbreviation, tokenHits([normalized(abbreviation)], in: haystack) > 0 {
+            score += 18
+        }
+        if let abbreviation = game.awayTeam.abbreviation, tokenHits([normalized(abbreviation)], in: haystack) > 0 {
+            score += 18
+        }
 
         if homeHits > 0 && awayHits > 0 {
             score += 25
@@ -209,6 +313,10 @@ struct SportsGameMatcher {
             let delta = abs(game.gameDate.timeIntervalSince(draftDate))
             if delta < 60 * 60 * 2 {
                 score += 8
+            } else if delta < 60 * 60 * 14 {
+                score += 6
+            } else if delta < 60 * 60 * 30 {
+                score += 3
             }
         }
 
@@ -224,11 +332,36 @@ struct SportsGameMatcher {
     }
 
     private func significantTokens(_ value: String) -> [String] {
-        let ignored: Set<String> = ["the", "at", "vs", "and", "of", "university", "college"]
+        let ignored: Set<String> = ["the", "at", "vs", "and", "of", "for", "university", "college", "mens", "womens"]
         return normalized(value)
             .split(separator: " ")
             .map(String.init)
             .filter { $0.count > 2 && !ignored.contains($0) }
+    }
+
+    private func teamTokens(_ team: SportsTeamInfo) -> [String] {
+        var tokens = significantTokens(team.name)
+        if let abbreviation = team.abbreviation {
+            let normalizedAbbreviation = normalized(abbreviation)
+            if !normalizedAbbreviation.isEmpty {
+                tokens.append(normalizedAbbreviation)
+            }
+        }
+        tokens.append(contentsOf: mascotAliases(for: tokens))
+        return Array(Set(tokens))
+    }
+
+    private func mascotAliases(for tokens: [String]) -> [String] {
+        tokens.flatMap { token -> [String] in
+            guard token.count > 3 else { return [] }
+            if token.hasSuffix("ies") {
+                return [String(token.dropLast(3)) + "y"]
+            }
+            if token.hasSuffix("s") {
+                return [String(token.dropLast())]
+            }
+            return [token + "s"]
+        }
     }
 
     private func tokenHits(_ tokens: [String], in text: String) -> Int {
@@ -238,6 +371,15 @@ struct SportsGameMatcher {
 
 private struct ESPNScoreboard: Decodable {
     var events: [ESPNEvent]
+
+    enum CodingKeys: String, CodingKey {
+        case events
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        events = try container.decodeIfPresent([ESPNEvent].self, forKey: .events) ?? []
+    }
 }
 
 private struct ESPNEvent: Decodable {
@@ -247,6 +389,25 @@ private struct ESPNEvent: Decodable {
     var competitions: [ESPNCompetition]
     var links: [ESPNLink]?
     var status: ESPNStatus?
+
+    enum CodingKeys: String, CodingKey {
+        case id
+        case date
+        case name
+        case competitions
+        case links
+        case status
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decodeIfPresent(String.self, forKey: .id) ?? UUID().uuidString
+        date = try container.decodeIfPresent(String.self, forKey: .date)
+        name = try container.decodeIfPresent(String.self, forKey: .name)
+        competitions = try container.decodeIfPresent([ESPNCompetition].self, forKey: .competitions) ?? []
+        links = try container.decodeIfPresent([ESPNLink].self, forKey: .links)
+        status = try container.decodeIfPresent(ESPNStatus.self, forKey: .status)
+    }
 }
 
 private struct ESPNCompetition: Decodable {
@@ -254,6 +415,21 @@ private struct ESPNCompetition: Decodable {
     var venue: ESPNVenue?
     var competitors: [ESPNCompetitor]
     var status: ESPNStatus?
+
+    enum CodingKeys: String, CodingKey {
+        case date
+        case venue
+        case competitors
+        case status
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        date = try container.decodeIfPresent(String.self, forKey: .date)
+        venue = try container.decodeIfPresent(ESPNVenue.self, forKey: .venue)
+        competitors = try container.decodeIfPresent([ESPNCompetitor].self, forKey: .competitors) ?? []
+        status = try container.decodeIfPresent(ESPNStatus.self, forKey: .status)
+    }
 }
 
 private struct ESPNVenue: Decodable {
@@ -270,14 +446,14 @@ private struct ESPNCompetitor: Decodable {
     var id: String?
     var homeAway: String?
     var score: String?
-    var team: ESPNTeam
+    var team: ESPNTeam?
 
     var sportsTeam: SportsTeamInfo {
         SportsTeamInfo(
-            id: id ?? team.id ?? UUID().uuidString,
-            name: team.displayName ?? team.name ?? team.location ?? "Team",
-            abbreviation: team.abbreviation,
-            logoURL: team.logo.flatMap(URL.init(string:))
+            id: id ?? team?.id ?? UUID().uuidString,
+            name: team?.displayName ?? team?.name ?? team?.location ?? "Team",
+            abbreviation: team?.abbreviation,
+            logoURL: team?.logoURL
         )
     }
 }
@@ -289,6 +465,16 @@ private struct ESPNTeam: Decodable {
     var displayName: String?
     var abbreviation: String?
     var logo: String?
+    var logos: [ESPNLogo]?
+
+    var logoURL: URL? {
+        logo.flatMap(URL.init(string:))
+            ?? logos?.first(where: { $0.href != nil })?.href
+    }
+}
+
+private struct ESPNLogo: Decodable {
+    var href: URL?
 }
 
 private struct ESPNStatus: Decodable {

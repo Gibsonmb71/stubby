@@ -3,12 +3,17 @@ import SwiftUI
 struct EventDetailView: View {
     @EnvironmentObject private var eventStore: EventStore
     @Environment(\.dismiss) private var dismiss
+    @State private var deleteFeedbackTrigger = false
 
     var event: Event
 
     var body: some View {
         List {
-            if let imageURL = event.imageURL {
+            if let sportsGame = event.sportsGame {
+                SportsGameScoreboardView(match: sportsGame)
+                    .listRowInsets(EdgeInsets(top: 14, leading: 18, bottom: 10, trailing: 18))
+                    .listRowBackground(Color.clear)
+            } else if let imageURL = event.imageURL {
                 AsyncImage(url: imageURL) { image in
                     image
                         .resizable()
@@ -43,9 +48,6 @@ struct EventDetailView: View {
                     DetailRow(title: "ESPN ID", value: sportsGame.espnEventID)
                     DetailRow(title: "Away", value: sportsGame.awayTeam.name)
                     DetailRow(title: "Home", value: sportsGame.homeTeam.name)
-                    if let score = sportsGame.scoreSummary {
-                        DetailRow(title: "Score", value: score)
-                    }
                     if let status = sportsGame.status {
                         DetailRow(title: "Status", value: status)
                     }
@@ -98,6 +100,7 @@ struct EventDetailView: View {
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button(role: .destructive) {
+                    deleteFeedbackTrigger.toggle()
                     eventStore.delete(event)
                     dismiss()
                 } label: {
@@ -105,6 +108,7 @@ struct EventDetailView: View {
                 }
             }
         }
+        .sensoryFeedback(.warning, trigger: deleteFeedbackTrigger)
     }
 }
 

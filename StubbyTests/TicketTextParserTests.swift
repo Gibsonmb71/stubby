@@ -88,4 +88,50 @@ final class TicketTextParserTests: XCTestCase {
         XCTAssertEqual(components.hour, 16)
         XCTAssertEqual(components.minute, 0)
     }
+
+    func testParsesTicketmasterGamecockBasketballLayoutWithUpperLevelNoise() throws {
+        let parser = TicketTextParser()
+        let details = parser.parse(textLines: [
+            "15:124",
+            "1",
+            "vs. Georgia",
+            "JAN 10",
+            "14:00",
+            "GAMECOCK",
+            "MEN'S BASKETBALL",
+            "Colonial Life Arena",
+            "Sec",
+            "Row",
+            "Seat",
+            "UPPER",
+            "LEVEL",
+            "219",
+            "1",
+            "17",
+            "Verified Resale Ticket",
+            "Colonial Life Arena",
+            "ticketmaster"
+        ])
+
+        XCTAssertEqual(details.title, "South Carolina Gamecocks MEN'S BASKETBALL vs. Georgia")
+        XCTAssertEqual(details.venue, "Colonial Life Arena")
+        XCTAssertEqual(details.section, "219")
+        XCTAssertEqual(details.row, "1")
+        XCTAssertEqual(details.seat, "17")
+
+        XCTAssertNil(details.date)
+        let dateMissingYear = try XCTUnwrap(details.dateMissingYear)
+        XCTAssertEqual(dateMissingYear.month, 1)
+        XCTAssertEqual(dateMissingYear.day, 10)
+        XCTAssertEqual(dateMissingYear.hour, 14)
+        XCTAssertEqual(dateMissingYear.minute, 0)
+
+        let resolvedDate = try XCTUnwrap(dateMissingYear.date(in: 2026))
+        let components = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: resolvedDate)
+        XCTAssertEqual(components.year, 2026)
+        XCTAssertEqual(components.month, 1)
+        XCTAssertEqual(components.day, 10)
+        XCTAssertEqual(components.hour, 14)
+        XCTAssertEqual(components.minute, 0)
+    }
 }

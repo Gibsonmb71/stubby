@@ -10,6 +10,9 @@ struct ContentView: View {
     @State private var queuedImports: [TicketImportResult] = []
     @State private var importError: ImportErrorMessage?
     @State private var isImporting = false
+    @State private var importPickerFeedbackTrigger = false
+    @State private var importSuccessFeedbackTrigger = false
+    @State private var importErrorFeedbackTrigger = false
 
     private let importService = TicketImportService()
 
@@ -65,17 +68,22 @@ struct ContentView: View {
                 await handlePhotoImport(newItems)
             }
         }
+        .sensoryFeedback(.selection, trigger: importPickerFeedbackTrigger)
+        .sensoryFeedback(.success, trigger: importSuccessFeedbackTrigger)
+        .sensoryFeedback(.error, trigger: importErrorFeedbackTrigger)
     }
 
     private var importButton: some View {
         Menu {
             Button {
+                importPickerFeedbackTrigger.toggle()
                 isShowingPhotoPicker = true
             } label: {
                 Label("Photo Library", systemImage: "photo.on.rectangle")
             }
 
             Button {
+                importPickerFeedbackTrigger.toggle()
                 isShowingPhotoPicker = true
             } label: {
                 Label("Bulk From Photo Library", systemImage: "square.stack")
@@ -110,6 +118,7 @@ struct ContentView: View {
         }
 
         if let first = importedResults.first {
+            importSuccessFeedbackTrigger.toggle()
             queuedImports.append(contentsOf: importedResults.dropFirst())
             if importedTicket == nil {
                 importedTicket = first
@@ -117,6 +126,7 @@ struct ContentView: View {
                 queuedImports.insert(first, at: 0)
             }
         } else if let firstError {
+            importErrorFeedbackTrigger.toggle()
             importError = ImportErrorMessage(firstError)
         }
     }

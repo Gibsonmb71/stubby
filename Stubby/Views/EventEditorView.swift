@@ -14,6 +14,10 @@ struct EventEditorView: View {
     @State private var locationMatchError: String?
     @State private var lastLocationMatchQuery = ""
     @State private var isShowingBarcodes = false
+    @State private var selectionFeedbackTrigger = false
+    @State private var successFeedbackTrigger = false
+    @State private var warningFeedbackTrigger = false
+    @State private var errorFeedbackTrigger = false
 
     private let originalDraft: ImportedEventDraft
     private let onApplySportsMatch: (SportsGameMatch, URL?) -> Void
@@ -119,6 +123,7 @@ struct EventEditorView: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") {
+                        warningFeedbackTrigger.toggle()
                         dismiss()
                     }
                 }
@@ -131,10 +136,17 @@ struct EventEditorView: View {
                 }
             }
             .onChange(of: draft.isGeneralAdmission) { _, isGeneralAdmission in
+                selectionFeedbackTrigger.toggle()
                 guard isGeneralAdmission else { return }
                 draft.section = ""
                 draft.row = ""
                 draft.seat = ""
+            }
+            .onChange(of: hasDate) { _, _ in
+                selectionFeedbackTrigger.toggle()
+            }
+            .onChange(of: isShowingBarcodes) { _, _ in
+                selectionFeedbackTrigger.toggle()
             }
             .onChange(of: draft.venue) { _, newValue in
                 guard normalizedLocationName(newValue) != normalizedLocationName(lastLocationMatchQuery) else { return }
@@ -152,6 +164,10 @@ struct EventEditorView: View {
                 guard draft.sportsGame == nil else { return }
                 await matchLocationIfNeeded()
             }
+            .sensoryFeedback(.selection, trigger: selectionFeedbackTrigger)
+            .sensoryFeedback(.success, trigger: successFeedbackTrigger)
+            .sensoryFeedback(.warning, trigger: warningFeedbackTrigger)
+            .sensoryFeedback(.error, trigger: errorFeedbackTrigger)
         }
     }
 
@@ -172,6 +188,7 @@ struct EventEditorView: View {
         case .matched(let match):
             SportsMatchSummary(match: match)
             Button(role: .destructive) {
+                warningFeedbackTrigger.toggle()
                 onRevertSportsMatch()
             } label: {
                 Label("Revert ESPN Details", systemImage: "arrow.uturn.backward")
@@ -180,6 +197,7 @@ struct EventEditorView: View {
         case .candidates(let candidates):
             ForEach(candidates.prefix(5)) { match in
                 Button {
+                    successFeedbackTrigger.toggle()
                     onApplySportsMatch(match, selectedLogoURL(for: match))
                     hasDate = true
                     eventDate = match.gameDate
@@ -203,6 +221,11 @@ struct EventEditorView: View {
                 .font(.footnote)
                 .foregroundStyle(.secondary)
 
+        case .needsDateYear:
+            Text("Choose the ticket year on the seat confirmation screen to start ESPN lookup.")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+
         case .searching:
             Text("Using the event date, team names, and venue from the ticket.")
                 .font(.footnote)
@@ -218,6 +241,8 @@ struct EventEditorView: View {
             return "list.bullet"
         case .failed:
             return "exclamationmark.triangle"
+        case .needsDateYear:
+            return "calendar.badge.exclamationmark"
         case .noMatch:
             return "magnifyingglass"
         default:
@@ -316,6 +341,7 @@ struct EventEditorView: View {
             }
 
             Button {
+                selectionFeedbackTrigger.toggle()
                 Task {
                     await matchLocation(applyExactMatch: false)
                 }
@@ -349,6 +375,7 @@ struct EventEditorView: View {
             }
 
             Button {
+                selectionFeedbackTrigger.toggle()
                 Task {
                     await matchLocation(applyExactMatch: false)
                 }
@@ -387,6 +414,7 @@ struct EventEditorView: View {
             lastLocationMatchQuery = query
             guard let match = try await locationMatcher.match(query: query) else {
                 locationMatchError = "No Apple Maps match found."
+                errorFeedbackTrigger.toggle()
                 return
             }
 
@@ -394,11 +422,14 @@ struct EventEditorView: View {
                 draft.venue = match.name
                 lastLocationMatchQuery = match.name
                 locationMatchMessage = "Matched in Apple Maps."
+                successFeedbackTrigger.toggle()
             } else {
                 locationMatch = match
+                selectionFeedbackTrigger.toggle()
             }
         } catch {
             locationMatchError = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
+            errorFeedbackTrigger.toggle()
         }
     }
 
@@ -407,6 +438,7 @@ struct EventEditorView: View {
     }
 
     private func apply(_ match: AppleMapsLocationMatch) {
+        successFeedbackTrigger.toggle()
         draft.venue = match.name
         lastLocationMatchQuery = match.name
         locationMatch = nil
@@ -415,6 +447,7 @@ struct EventEditorView: View {
     }
 
     private func save() {
+        successFeedbackTrigger.toggle()
         var savedDraft = draft
         savedDraft.date = hasDate ? eventDate : nil
         if savedDraft.isGeneralAdmission {
@@ -436,14 +469,10 @@ private struct SportsMatchSummary: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(match.title)
-                .font(.headline)
+            SportsGameScoreboardView(match: match)
             Label(match.gameDate.formatted(date: .abbreviated, time: .shortened), systemImage: "calendar")
             if let venue = match.venue {
                 Label(venue, systemImage: "mappin.and.ellipse")
-            }
-            if let score = match.scoreSummary {
-                Label(score, systemImage: "sportscourt")
             }
             if let status = match.status {
                 Text(status)

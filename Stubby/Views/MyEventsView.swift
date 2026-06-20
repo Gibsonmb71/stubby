@@ -2,6 +2,7 @@ import SwiftUI
 
 struct MyEventsView: View {
     @EnvironmentObject private var eventStore: EventStore
+    @State private var deleteFeedbackTrigger = false
 
     var isImporting: Bool
 
@@ -50,6 +51,7 @@ struct MyEventsView: View {
                         }
                         .swipeActions {
                             Button(role: .destructive) {
+                                deleteFeedbackTrigger.toggle()
                                 eventStore.delete(event)
                             } label: {
                                 Label("Delete", systemImage: "trash")
@@ -57,6 +59,7 @@ struct MyEventsView: View {
                         }
                         .contextMenu {
                             Button(role: .destructive) {
+                                deleteFeedbackTrigger.toggle()
                                 eventStore.delete(event)
                             } label: {
                                 Label("Delete", systemImage: "trash")
@@ -70,6 +73,7 @@ struct MyEventsView: View {
             }
         }
         .listStyle(.insetGrouped)
+        .sensoryFeedback(.warning, trigger: deleteFeedbackTrigger)
     }
 
     private var eventSections: [EventYearSection] {
@@ -100,6 +104,7 @@ struct MyEventsView: View {
     }
 
     private func delete(_ offsets: IndexSet, in section: EventYearSection) {
+        deleteFeedbackTrigger.toggle()
         let eventsToDelete = offsets.map { section.events[$0] }
         eventsToDelete.forEach(eventStore.delete)
     }
