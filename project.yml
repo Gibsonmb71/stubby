@@ -1,0 +1,51 @@
+name: Stubby
+options:
+  bundleIdPrefix: com.gibsonbell
+  deploymentTarget:
+    iOS: "26.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    SWIFT_VERSION: 5.0
+    DEVELOPMENT_TEAM: ""
+targets:
+  Stubby:
+    type: application
+    platform: iOS
+    deploymentTarget: "26.0"
+    sources:
+      - path: Stubby
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.gibsonbell.stubby
+        PRODUCT_NAME: Stubby
+        CODE_SIGN_ENTITLEMENTS: Stubby/Resources/Stubby.entitlements
+        MARKETING_VERSION: 1.0
+        CURRENT_PROJECT_VERSION: 1
+        TARGETED_DEVICE_FAMILY: "1,2"
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: Stubby
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents: YES
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+  StubbyTests:
+    type: bundle.unit-test
+    platform: iOS
+    deploymentTarget: "26.0"
+    sources:
+      - path: StubbyTests
+    dependencies:
+      - target: Stubby
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.gibsonbell.stubby.tests
+        GENERATE_INFOPLIST_FILE: YES
+schemes:
+  Stubby:
+    build:
+      targets:
+        Stubby: all
+        StubbyTests: [test]
+    test:
+      targets:
+        - StubbyTests

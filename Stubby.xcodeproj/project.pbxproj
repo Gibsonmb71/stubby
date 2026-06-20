@@ -1,0 +1,537 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		12760CE9E47EC0EEC795FF8A /* Stubby.icon in Resources */ = {isa = PBXBuildFile; fileRef = 571E4B3E9813A348B79BCB85 /* Stubby.icon */; };
+		25434D394C8C86CA9081202B /* EventCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F369A28B43A55FCC08F816E2 /* EventCardView.swift */; };
+		2B5C4359D09124EBC42AA17A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A758015563AAC67657D0E5D3 /* Assets.xcassets */; };
+		3A8053F9DDB85038C7E1BC8B /* ImportReviewFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAA6B8795FE8058AEAC3B37F /* ImportReviewFlowView.swift */; };
+		3ACA79694FDE453B56E5A02E /* GlassStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8523A8EB0B1CB75BF8F976EC /* GlassStyle.swift */; };
+		4514A2D9F8BC62FC86F184FB /* StubbyApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4360A61FF56890DE3043606B /* StubbyApp.swift */; };
+		45D3B17042877CE09630748C /* TicketTextParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC36ED4D4F4F8185DAAAABB2 /* TicketTextParserTests.swift */; };
+		4B270698A911DF480C84337B /* EventStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660C22842329AB74CE96328B /* EventStore.swift */; };
+		4FD498968CFFE280F3ACBF9B /* EventDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5EB60F558B2F17B0A4C1028 /* EventDetailView.swift */; };
+		6504A3CCAF78BF3040B1FE50 /* ImportedEventDraft.swift in Sources */ = {isa = PBXBuildFile; fileRef = E88A981525DDDE91A02F92A2 /* ImportedEventDraft.swift */; };
+		6EF6B30289CE08F9BEBBF607 /* SportsGameMatcherTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DC9437A9A216FB6CF4C3933 /* SportsGameMatcherTests.swift */; };
+		8675778469FE056E9624E9FD /* Event.swift in Sources */ = {isa = PBXBuildFile; fileRef = 590FB77A121044894830305B /* Event.swift */; };
+		8F81AAA0BA5A4204E8BAC5D9 /* TicketImportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F403559ACF904E53BE8A8CEA /* TicketImportService.swift */; };
+		9166C82406DD0467D4E033F7 /* TicketTextParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECE3FE7FAE9F634F20ABADDA /* TicketTextParser.swift */; };
+		95B8F3929759697263D10DD9 /* SportsDataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B089FABF751A44406515F23 /* SportsDataProvider.swift */; };
+		ADA1AD28E06C1505BDE7B83A /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8126B1D7B7C677BA693FE49 /* ContentView.swift */; };
+		C4C31910DBD3E1BF2FF7A35B /* EventEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40C379963D0335CBDFA6ED69 /* EventEditorView.swift */; };
+		D4BDCC463FF595E52D3272BE /* MyEventsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1F36937A2EAE6F3076C438F /* MyEventsView.swift */; };
+		D61AB60F4B007263953F3F6C /* SportsModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F3967D32EAF2F49D3DDCCD4 /* SportsModels.swift */; };
+		DE43E684626CFD49D69788B7 /* OCRService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E8F903F92AC5C6FD61F40D3 /* OCRService.swift */; };
+		F8BEEFA9D94958AA3ACF1A4F /* RecognizedTextLine.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0FD21D206EC980528371F86 /* RecognizedTextLine.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		02C363E5FFAD5E9975CE9320 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = EBD28DE2C764D8387C1A317F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 00897512D2D60B6A3731B408;
+			remoteInfo = Stubby;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		0097621A4D6043C9758890AE /* Stubby.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Stubby.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		00A942CC2EE1C6FC024525EB /* Stubby.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Stubby.entitlements; sourceTree = "<group>"; };
+		3A6D81FA1D5E9136B2B218A5 /* StubbyTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = StubbyTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		40C379963D0335CBDFA6ED69 /* EventEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventEditorView.swift; sourceTree = "<group>"; };
+		4360A61FF56890DE3043606B /* StubbyApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StubbyApp.swift; sourceTree = "<group>"; };
+		571E4B3E9813A348B79BCB85 /* Stubby.icon */ = {isa = PBXFileReference; lastKnownFileType = wrapper.icon; path = Stubby.icon; sourceTree = "<group>"; };
+		590FB77A121044894830305B /* Event.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Event.swift; sourceTree = "<group>"; };
+		5E8F903F92AC5C6FD61F40D3 /* OCRService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OCRService.swift; sourceTree = "<group>"; };
+		660C22842329AB74CE96328B /* EventStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventStore.swift; sourceTree = "<group>"; };
+		6B089FABF751A44406515F23 /* SportsDataProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SportsDataProvider.swift; sourceTree = "<group>"; };
+		7DC9437A9A216FB6CF4C3933 /* SportsGameMatcherTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SportsGameMatcherTests.swift; sourceTree = "<group>"; };
+		8523A8EB0B1CB75BF8F976EC /* GlassStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlassStyle.swift; sourceTree = "<group>"; };
+		9F3967D32EAF2F49D3DDCCD4 /* SportsModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SportsModels.swift; sourceTree = "<group>"; };
+		A758015563AAC67657D0E5D3 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		BAA6B8795FE8058AEAC3B37F /* ImportReviewFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportReviewFlowView.swift; sourceTree = "<group>"; };
+		C1F36937A2EAE6F3076C438F /* MyEventsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyEventsView.swift; sourceTree = "<group>"; };
+		D0FD21D206EC980528371F86 /* RecognizedTextLine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecognizedTextLine.swift; sourceTree = "<group>"; };
+		E8126B1D7B7C677BA693FE49 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		E88A981525DDDE91A02F92A2 /* ImportedEventDraft.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportedEventDraft.swift; sourceTree = "<group>"; };
+		EC36ED4D4F4F8185DAAAABB2 /* TicketTextParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TicketTextParserTests.swift; sourceTree = "<group>"; };
+		ECE3FE7FAE9F634F20ABADDA /* TicketTextParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TicketTextParser.swift; sourceTree = "<group>"; };
+		F369A28B43A55FCC08F816E2 /* EventCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventCardView.swift; sourceTree = "<group>"; };
+		F403559ACF904E53BE8A8CEA /* TicketImportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TicketImportService.swift; sourceTree = "<group>"; };
+		F5EB60F558B2F17B0A4C1028 /* EventDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventDetailView.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		00C717A2A8AC69E7D2DEF88E /* StubbyTests */ = {
+			isa = PBXGroup;
+			children = (
+				7DC9437A9A216FB6CF4C3933 /* SportsGameMatcherTests.swift */,
+				EC36ED4D4F4F8185DAAAABB2 /* TicketTextParserTests.swift */,
+			);
+			path = StubbyTests;
+			sourceTree = "<group>";
+		};
+		0E3802E772A6D29D022D1E67 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				0097621A4D6043C9758890AE /* Stubby.app */,
+				3A6D81FA1D5E9136B2B218A5 /* StubbyTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		16703A83A4425C6B3CA8BE1A /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				A758015563AAC67657D0E5D3 /* Assets.xcassets */,
+				00A942CC2EE1C6FC024525EB /* Stubby.entitlements */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		202DF6E7B3C8532C04096624 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				660C22842329AB74CE96328B /* EventStore.swift */,
+				5E8F903F92AC5C6FD61F40D3 /* OCRService.swift */,
+				D0FD21D206EC980528371F86 /* RecognizedTextLine.swift */,
+				6B089FABF751A44406515F23 /* SportsDataProvider.swift */,
+				F403559ACF904E53BE8A8CEA /* TicketImportService.swift */,
+				ECE3FE7FAE9F634F20ABADDA /* TicketTextParser.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		36EE5AF1F58BD9E9CF545977 = {
+			isa = PBXGroup;
+			children = (
+				91C21B9BA00CF98C008F79C9 /* Stubby */,
+				00C717A2A8AC69E7D2DEF88E /* StubbyTests */,
+				0E3802E772A6D29D022D1E67 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		8EDBA41AE1407C5C02A66071 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				E8126B1D7B7C677BA693FE49 /* ContentView.swift */,
+				F369A28B43A55FCC08F816E2 /* EventCardView.swift */,
+				F5EB60F558B2F17B0A4C1028 /* EventDetailView.swift */,
+				40C379963D0335CBDFA6ED69 /* EventEditorView.swift */,
+				8523A8EB0B1CB75BF8F976EC /* GlassStyle.swift */,
+				BAA6B8795FE8058AEAC3B37F /* ImportReviewFlowView.swift */,
+				C1F36937A2EAE6F3076C438F /* MyEventsView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		91C21B9BA00CF98C008F79C9 /* Stubby */ = {
+			isa = PBXGroup;
+			children = (
+				571E4B3E9813A348B79BCB85 /* Stubby.icon */,
+				DA5F792C9CFFDCF3DF481EA9 /* App */,
+				DCEC325D4DD2674F796B4D6B /* Models */,
+				16703A83A4425C6B3CA8BE1A /* Resources */,
+				202DF6E7B3C8532C04096624 /* Services */,
+				8EDBA41AE1407C5C02A66071 /* Views */,
+			);
+			path = Stubby;
+			sourceTree = "<group>";
+		};
+		DA5F792C9CFFDCF3DF481EA9 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				4360A61FF56890DE3043606B /* StubbyApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		DCEC325D4DD2674F796B4D6B /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				590FB77A121044894830305B /* Event.swift */,
+				E88A981525DDDE91A02F92A2 /* ImportedEventDraft.swift */,
+				9F3967D32EAF2F49D3DDCCD4 /* SportsModels.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		00897512D2D60B6A3731B408 /* Stubby */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F59031D965EBDF9725D2223D /* Build configuration list for PBXNativeTarget "Stubby" */;
+			buildPhases = (
+				AAD7EF0B21DD70835ECD945A /* Sources */,
+				C85BF05A96E23441B87C5F98 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Stubby;
+			packageProductDependencies = (
+			);
+			productName = Stubby;
+			productReference = 0097621A4D6043C9758890AE /* Stubby.app */;
+			productType = "com.apple.product-type.application";
+		};
+		ADA60EEBAB0845C0CEA00165 /* StubbyTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1452054F90B1CB67D7CC52E2 /* Build configuration list for PBXNativeTarget "StubbyTests" */;
+			buildPhases = (
+				79B85F176D1A22DB3CF25729 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				11A18B6D09033685E9A00A84 /* PBXTargetDependency */,
+			);
+			name = StubbyTests;
+			packageProductDependencies = (
+			);
+			productName = StubbyTests;
+			productReference = 3A6D81FA1D5E9136B2B218A5 /* StubbyTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		EBD28DE2C764D8387C1A317F /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					ADA60EEBAB0845C0CEA00165 = {
+						DevelopmentTeam = "";
+					};
+				};
+			};
+			buildConfigurationList = 87EFCF925FF8664EF3D923E4 /* Build configuration list for PBXProject "Stubby" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 36EE5AF1F58BD9E9CF545977;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 0E3802E772A6D29D022D1E67 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				00897512D2D60B6A3731B408 /* Stubby */,
+				ADA60EEBAB0845C0CEA00165 /* StubbyTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		C85BF05A96E23441B87C5F98 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2B5C4359D09124EBC42AA17A /* Assets.xcassets in Resources */,
+				12760CE9E47EC0EEC795FF8A /* Stubby.icon in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		79B85F176D1A22DB3CF25729 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6EF6B30289CE08F9BEBBF607 /* SportsGameMatcherTests.swift in Sources */,
+				45D3B17042877CE09630748C /* TicketTextParserTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AAD7EF0B21DD70835ECD945A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				ADA1AD28E06C1505BDE7B83A /* ContentView.swift in Sources */,
+				8675778469FE056E9624E9FD /* Event.swift in Sources */,
+				25434D394C8C86CA9081202B /* EventCardView.swift in Sources */,
+				4FD498968CFFE280F3ACBF9B /* EventDetailView.swift in Sources */,
+				C4C31910DBD3E1BF2FF7A35B /* EventEditorView.swift in Sources */,
+				4B270698A911DF480C84337B /* EventStore.swift in Sources */,
+				3ACA79694FDE453B56E5A02E /* GlassStyle.swift in Sources */,
+				3A8053F9DDB85038C7E1BC8B /* ImportReviewFlowView.swift in Sources */,
+				6504A3CCAF78BF3040B1FE50 /* ImportedEventDraft.swift in Sources */,
+				D4BDCC463FF595E52D3272BE /* MyEventsView.swift in Sources */,
+				DE43E684626CFD49D69788B7 /* OCRService.swift in Sources */,
+				F8BEEFA9D94958AA3ACF1A4F /* RecognizedTextLine.swift in Sources */,
+				95B8F3929759697263D10DD9 /* SportsDataProvider.swift in Sources */,
+				D61AB60F4B007263953F3F6C /* SportsModels.swift in Sources */,
+				4514A2D9F8BC62FC86F184FB /* StubbyApp.swift in Sources */,
+				8F81AAA0BA5A4204E8BAC5D9 /* TicketImportService.swift in Sources */,
+				9166C82406DD0467D4E033F7 /* TicketTextParser.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		11A18B6D09033685E9A00A84 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 00897512D2D60B6A3731B408 /* Stubby */;
+			targetProxy = 02C363E5FFAD5E9975CE9320 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		1247F3E4BC3B2F26B2DF1612 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.gibsonbell.stubby.tests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Stubby.app/Stubby";
+			};
+			name = Debug;
+		};
+		2639CDF021FD9E4751EF95E6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Stubby/Resources/Stubby.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 57CW34C9J4;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Stubby;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.gibsonbell.stubby;
+				PRODUCT_NAME = Stubby;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		2991DD84ACDF2D791BD11C85 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.gibsonbell.stubby.tests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Stubby.app/Stubby";
+			};
+			name = Release;
+		};
+		76CD776D04CBF1C86FEA891E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		7A72AD05E72B0073FEFB8FC8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Stubby/Resources/Stubby.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 57CW34C9J4;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Stubby;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.gibsonbell.stubby;
+				PRODUCT_NAME = Stubby;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		F52496D5434E9532B9289708 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1452054F90B1CB67D7CC52E2 /* Build configuration list for PBXNativeTarget "StubbyTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1247F3E4BC3B2F26B2DF1612 /* Debug */,
+				2991DD84ACDF2D791BD11C85 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		87EFCF925FF8664EF3D923E4 /* Build configuration list for PBXProject "Stubby" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				76CD776D04CBF1C86FEA891E /* Debug */,
+				F52496D5434E9532B9289708 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		F59031D965EBDF9725D2223D /* Build configuration list for PBXNativeTarget "Stubby" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2639CDF021FD9E4751EF95E6 /* Debug */,
+				7A72AD05E72B0073FEFB8FC8 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = EBD28DE2C764D8387C1A317F /* Project object */;
+}
