@@ -16,10 +16,12 @@ struct TicketTextParser {
         let rawText = lines.joined(separator: "\n")
         let joinedText = lines.joined(separator: " ")
         let seatingDetails = parseSeatingDetails(from: lines, joinedText: joinedText)
+        let dateInfo = parseDateInfo(from: lines)
 
         return ParsedEventDetails(
             title: parseTitle(from: lines),
-            date: parseDate(from: lines),
+            date: dateInfo.date,
+            dateMissingYear: dateInfo.dateMissingYear,
             venue: parseVenue(from: lines),
             section: seatingDetails.section,
             row: seatingDetails.row,
@@ -31,6 +33,10 @@ struct TicketTextParser {
     }
 
     private func parseTitle(from lines: [String]) -> String? {
+        if let reconstructedSportsTitle = reconstructedSportsTitle(from: lines) {
+            return reconstructedSportsTitle
+        }
+
         if let dateLineIndex = lines.firstIndex(where: { containsDateToken($0) }) {
             let candidatesBeforeDate = bestTitleCandidates(from: Array(lines.prefix(dateLineIndex)))
             if let title = candidatesBeforeDate.first {
@@ -39,6 +45,36 @@ struct TicketTextParser {
         }
 
         return bestTitleCandidates(from: lines).first
+    }
+
+    private func reconstructedSportsTitle(from lines: [String]) -> String? {
+        guard let opponentIndex = lines.firstIndex(where: { line in
+            line.range(of: #"(?i)^\s*(vs\.?|at)\b"#, options: .regularExpression) != nil
+        }) else {
+            return nil
+        }
+
+        let opponentLine = cleanValue(lines[opponentIndex])
+        let contextStart = max(lines.startIndex, opponentIndex - 4)
+        let contextEnd = min(lines.endIndex - 1, opponentIndex + 8)
+        let context = lines[contextStart...contextEnd].joined(separator: " ")
+
+        guard context.range(of: #"(?i)\b(baseball|basketball|football|hockey|soccer)\b"#, options: .regularExpression) != nil else {
+            return nil
+        }
+
+        if context.range(of: #"(?i)\bgamecocks?\b"#, options: .regularExpression) != nil {
+            let sportLine = lines[contextStart...contextEnd]
+                .first { $0.range(of: #"(?i)\b(baseball|basketball|football|hockey|soccer)\b"#, options: .regularExpression) != nil }
+                .map(cleanValue) ?? ""
+            let sport = sportLine
+                .replacingOccurrences(of: #"(?i)\bgamecocks?\b"#, with: "", options: .regularExpression)
+                .replacingOccurrences(of: #"\s+"#, with: " ", options: .regularExpression)
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+            return cleanValue(["South Carolina Gamecocks", sport, opponentLine].filter { !$0.isEmpty }.joined(separator: " "))
+        }
+
+        return opponentLine
     }
 
     private func bestTitleCandidates(from lines: [String]) -> [String] {
@@ -70,7 +106,7 @@ struct TicketTextParser {
         guard normalized.count >= 3 else { return false }
         guard normalized.rangeOfCharacter(from: .letters) != nil else { return false }
         guard !isClockOnlyLine(normalized) else { return false }
-        guard parseDate(from: [normalized]) == nil else { return false }
+        guard !containsParseableDate(in: [normalized]) else { return false }
 
         let blockedFragments = [
             "ticketmaster", "apple wallet", "add to wallet", "view ticket", "mobile ticket",
@@ -91,17 +127,35 @@ struct TicketTextParser {
     }
 
     private func parseDate(from lines: [String]) -> Date? {
+        parseDateInfo(from: lines).date
+    }
+
+    private func containsParseableDate(in lines: [String]) -> Bool {
+        let dateInfo = parseDateInfo(from: lines)
+        return dateInfo.date != nil || dateInfo.dateMissingYear != nil
+    }
+
+    private func parseDateInfo(from lines: [String]) -> ParsedDateInfo {
         let preferredTexts = preferredDateTexts(from: lines)
+        if let date = parseDateWithExplicitYearFormatters(from: preferredTexts) {
+            return ParsedDateInfo(date: date, dateMissingYear: nil)
+        }
+
         let detector = try? NSDataDetector(types: NSTextCheckingResult.CheckingType.date.rawValue)
 
         for text in preferredTexts {
+            guard containsExplicitYearToken(text) else { continue }
             let range = NSRange(text.startIndex..<text.endIndex, in: text)
             if let match = detector?.firstMatch(in: text, options: [], range: range), let date = match.date {
-                return date
+                return ParsedDateInfo(date: date, dateMissingYear: nil)
             }
         }
 
-        return parseDateWithFormatters(from: preferredTexts)
+        if let partialDate = parseDateMissingYear(from: preferredTexts) {
+            return ParsedDateInfo(date: nil, dateMissingYear: partialDate)
+        }
+
+        return ParsedDateInfo(date: nil, dateMissingYear: nil)
     }
 
     private func preferredDateTexts(from lines: [String]) -> [String] {
@@ -157,7 +211,7 @@ struct TicketTextParser {
     }
 
     private func isEventTimeOnlyLine(_ text: String) -> Bool {
-        text.range(of: #"(?i)^\s*\d{1,2}:\d{2}\s*(?:a\.?m\.?|p\.?m\.?)\s*$"#, options: .regularExpression) != nil
+        text.range(of: #"(?i)^\s*\d{1,2}:\d{2}\s*(?:a\.?m\.?|p\.?m\.?)?\s*$"#, options: .regularExpression) != nil
     }
 
     private func candidateWindows(from lines: [String]) -> [String] {
@@ -176,7 +230,7 @@ struct TicketTextParser {
         return windows
     }
 
-    private func parseDateWithFormatters(from texts: [String]) -> Date? {
+    private func parseDateWithExplicitYearFormatters(from texts: [String]) -> Date? {
         let locale = Locale(identifier: "en_US_POSIX")
         let formats = [
             "EEE, MMM d, yyyy h:mm a",
@@ -202,6 +256,8 @@ struct TicketTextParser {
             for format in formats {
                 let formatter = DateFormatter()
                 formatter.locale = locale
+                formatter.calendar = Calendar(identifier: .gregorian)
+                formatter.timeZone = .current
                 formatter.dateFormat = format
                 if let date = formatter.date(from: cleaned) {
                     return date
@@ -212,6 +268,55 @@ struct TicketTextParser {
         return nil
     }
 
+    private func parseDateMissingYear(from texts: [String]) -> PartialEventDate? {
+        let locale = Locale(identifier: "en_US_POSIX")
+        let formats = [
+            "MMM d h:mm a",
+            "MMMM d h:mm a",
+            "MMM d HH:mm",
+            "MMMM d HH:mm",
+            "M/d h:mm a",
+            "M/d HH:mm",
+            "MMM d",
+            "MMMM d",
+            "M/d"
+        ]
+        let defaultDate = Calendar(identifier: .gregorian).date(from: DateComponents(year: 2000, month: 1, day: 1))
+
+        for text in texts where !containsExplicitYearToken(text) {
+            let cleaned = text
+                .replacingOccurrences(of: #"(?i)\b(date|time|doors|event date)\b[: ]*"#, with: "", options: .regularExpression)
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+
+            for format in formats {
+                let formatter = DateFormatter()
+                formatter.locale = locale
+                formatter.calendar = Calendar(identifier: .gregorian)
+                formatter.timeZone = .current
+                formatter.defaultDate = defaultDate
+                formatter.dateFormat = format
+                guard let date = formatter.date(from: cleaned) else { continue }
+
+                let components = Calendar.current.dateComponents([.month, .day, .hour, .minute], from: date)
+                guard let month = components.month, let day = components.day else { continue }
+                let includesTime = format.contains("h") || format.contains("H")
+                return PartialEventDate(
+                    month: month,
+                    day: day,
+                    hour: includesTime ? components.hour : nil,
+                    minute: includesTime ? components.minute : nil
+                )
+            }
+        }
+
+        return nil
+    }
+
+    private func containsExplicitYearToken(_ text: String) -> Bool {
+        text.range(of: #"\b(?:19|20)\d{2}\b"#, options: .regularExpression) != nil ||
+            text.range(of: #"\b\d{1,2}[/-]\d{1,2}[/-]\d{2,4}\b"#, options: .regularExpression) != nil
+    }
+
     private func parseVenue(from lines: [String]) -> String? {
         for line in lines {
             if let explicit = capture(pattern: #"(?i)\b(?:venue|location)\b\s*[:\-]?\s*(.+)$"#, in: line) {
@@ -220,12 +325,12 @@ struct TicketTextParser {
         }
 
         if let venueLine = lines.first(where: { line in
-            containsVenueKeyword(line) && !isSeatLine(line) && parseDate(from: [line]) == nil
+            containsVenueKeyword(line) && !isSeatLine(line) && !containsParseableDate(in: [line])
         }) {
             return cleanValue(venueLine)
         }
 
-        if let dateIndex = lines.firstIndex(where: { parseDate(from: [$0]) != nil }) {
+        if let dateIndex = lines.firstIndex(where: { containsParseableDate(in: [$0]) }) {
             let following = lines.dropFirst(dateIndex + 1).prefix(4)
             return following.first { line in
                 isLikelyVenueFallback(line)
@@ -250,7 +355,7 @@ struct TicketTextParser {
         guard line.rangeOfCharacter(from: .letters) != nil else { return false }
         guard !isSeatLine(line) else { return false }
         guard parseGeneralAdmission(in: line) == false else { return false }
-        guard parseDate(from: [line]) == nil else { return false }
+        guard !containsParseableDate(in: [line]) else { return false }
         return !["ticketmaster", "barcode", "order", "account", "gate", "entry"].contains { lower.contains($0) }
     }
 
@@ -367,10 +472,20 @@ struct TicketTextParser {
     private func isLikelySeatingValue(_ value: String) -> Bool {
         let cleaned = cleanValue(value)
         guard !cleaned.isEmpty, cleaned.count <= 12 else { return false }
+        guard !isSeatingDescriptor(cleaned) else { return false }
         guard cleaned.range(of: #"(?i)\b(entry|ticket|type|expired|info|barcode|resale)\b"#, options: .regularExpression) == nil else {
             return false
         }
         return cleaned.range(of: #"^[A-Z0-9][A-Z0-9\-]*$"#, options: [.regularExpression, .caseInsensitive]) != nil
+    }
+
+    private func isSeatingDescriptor(_ value: String) -> Bool {
+        let lower = value.lowercased()
+        let descriptors: Set<String> = [
+            "upper", "lower", "level", "club", "suite", "suites", "balcony",
+            "mezzanine", "floor", "reserved", "premium", "standard"
+        ]
+        return descriptors.contains(lower)
     }
 
     private func normalizedWords(in line: String) -> [String] {
@@ -440,6 +555,11 @@ private struct SeatingDetails {
             seat = value
         }
     }
+}
+
+private struct ParsedDateInfo {
+    var date: Date?
+    var dateMissingYear: PartialEventDate?
 }
 
 private enum SeatingLabel {

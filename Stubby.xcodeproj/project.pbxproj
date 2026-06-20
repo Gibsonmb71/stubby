@@ -24,6 +24,7 @@
 		95B8F3929759697263D10DD9 /* SportsDataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B089FABF751A44406515F23 /* SportsDataProvider.swift */; };
 		ADA1AD28E06C1505BDE7B83A /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8126B1D7B7C677BA693FE49 /* ContentView.swift */; };
 		C4C31910DBD3E1BF2FF7A35B /* EventEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40C379963D0335CBDFA6ED69 /* EventEditorView.swift */; };
+		C909B449B8E540C88AF46F58 /* SportsGameScoreboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51D7B74FAF91411B9B533DD6 /* SportsGameScoreboardView.swift */; };
 		D4BDCC463FF595E52D3272BE /* MyEventsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1F36937A2EAE6F3076C438F /* MyEventsView.swift */; };
 		D61AB60F4B007263953F3F6C /* SportsModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F3967D32EAF2F49D3DDCCD4 /* SportsModels.swift */; };
 		DE43E684626CFD49D69788B7 /* OCRService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E8F903F92AC5C6FD61F40D3 /* OCRService.swift */; };
@@ -46,6 +47,7 @@
 		3A6D81FA1D5E9136B2B218A5 /* StubbyTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = StubbyTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		40C379963D0335CBDFA6ED69 /* EventEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventEditorView.swift; sourceTree = "<group>"; };
 		4360A61FF56890DE3043606B /* StubbyApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StubbyApp.swift; sourceTree = "<group>"; };
+		51D7B74FAF91411B9B533DD6 /* SportsGameScoreboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SportsGameScoreboardView.swift; sourceTree = "<group>"; };
 		571E4B3E9813A348B79BCB85 /* Stubby.icon */ = {isa = PBXFileReference; lastKnownFileType = wrapper.icon; path = Stubby.icon; sourceTree = "<group>"; };
 		590FB77A121044894830305B /* Event.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Event.swift; sourceTree = "<group>"; };
 		5E8F903F92AC5C6FD61F40D3 /* OCRService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OCRService.swift; sourceTree = "<group>"; };
@@ -127,6 +129,7 @@
 				8523A8EB0B1CB75BF8F976EC /* GlassStyle.swift */,
 				BAA6B8795FE8058AEAC3B37F /* ImportReviewFlowView.swift */,
 				C1F36937A2EAE6F3076C438F /* MyEventsView.swift */,
+				51D7B74FAF91411B9B533DD6 /* SportsGameScoreboardView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -274,6 +277,7 @@
 				DE43E684626CFD49D69788B7 /* OCRService.swift in Sources */,
 				F8BEEFA9D94958AA3ACF1A4F /* RecognizedTextLine.swift in Sources */,
 				95B8F3929759697263D10DD9 /* SportsDataProvider.swift in Sources */,
+				C909B449B8E540C88AF46F58 /* SportsGameScoreboardView.swift in Sources */,
 				D61AB60F4B007263953F3F6C /* SportsModels.swift in Sources */,
 				4514A2D9F8BC62FC86F184FB /* StubbyApp.swift in Sources */,
 				8F81AAA0BA5A4204E8BAC5D9 /* TicketImportService.swift in Sources */,
